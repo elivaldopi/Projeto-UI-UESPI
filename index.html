@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Netinho.io — guia do litoral do Piauí com condições de vento, clima e maré em tempo real.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Netinho.io — Litoral do Piauí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambiente" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<header class="topo">
+  <div class="marca">
+    <b>Netinho.io</b>
+    <span>Litoral do Piauí</span>
+  </div>
+
+  <button class="btn-condicoes" id="btnCondicoes" aria-expanded="false" aria-controls="painelCondicoes"
+          aria-label="Abrir condições de vento, clima e maré">
+    <svg class="rosa" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.4" opacity=".28"/>
+      <circle cx="16" cy="16" r="9"  stroke="currentColor" stroke-width="1"   opacity=".14"/>
+      <g class="agulha" id="agulhaBtn">
+        <path d="M16 6.5 L20 20 L16 17 L12 20 Z" fill="currentColor"/>
+      </g>
+    </svg>
+    <span class="btn-txt">
+      <span class="btn-vento" id="btnVento">-- kt</span>
+      <span class="btn-local" id="btnLocal">Barra Grande</span>
+    </span>
+  </button>
+</header>
+
+<div class="overlay" id="overlay" aria-hidden="true"></div>
+
+<section class="painel vidro" id="painelCondicoes" role="dialog" aria-modal="false"
+         aria-label="Condições do litoral" hidden>
+  <canvas id="telaVento" aria-hidden="true"></canvas>
+
+  <div class="painel-conteudo">
+    <div class="puxador" aria-hidden="true"></div>
+
+    <div class="painel-topo">
+      <div class="painel-titulo">
+        <h2>Condições agora</h2>
+        <span class="selo" id="seloFonte">carregando</span>
+      </div>
+    </div>
+
+    <div class="spots" id="listaSpots" role="group" aria-label="Escolher praia"></div>
+
+    <div class="painel-corpo" id="corpoPainel">
+      <div class="vento-hero">
+        <div class="vento-num"><span id="vNum">--</span><span class="vento-un">kt</span></div>
+        <div class="vento-meta">
+          <span id="vDir">--</span> · rajada <b id="vRajada">--</b> kt<br>
+          <span id="vDesc">buscando dados…</span>
+        </div>
+      </div>
+
+      <div class="veredito" id="veredito">
+        <span class="bolha" style="background:var(--ink-faint)"></span>
+        <span id="vereditoTxt">Avaliando condições de kite…</span>
+      </div>
+
+      <div class="grade">
+        <div class="cartao">
+          <div class="cartao-rot">Temperatura</div>
+          <div class="cartao-val" id="cTemp">--°</div>
+          <div class="cartao-sub" id="cTempSub">sensação --°</div>
+        </div>
+        <div class="cartao">
+          <div class="cartao-rot">Céu</div>
+          <div class="cartao-val" id="cCeu" style="font-size:15px">--</div>
+          <div class="cartao-sub" id="cChuva">-- % de chuva</div>
+        </div>
+        <div class="cartao">
+          <div class="cartao-rot">Mar</div>
+          <div class="cartao-val" id="cOnda">--</div>
+          <div class="cartao-sub" id="cOndaSub">água --°</div>
+        </div>
+        <div class="cartao">
+          <div class="cartao-rot">UV</div>
+          <div class="cartao-val" id="cUv">--</div>
+          <div class="cartao-sub" id="cUvSub">--</div>
+        </div>
+
+        <div class="cartao largo">
+          <div class="cartao-rot" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Maré</span><span class="selo estimado" id="seloMare">estimativa</span>
+          </div>
+          <svg class="mare-curva" id="mareCurva" viewBox="0 0 300 56" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gradMare" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#0E5C73" stop-opacity=".22"/>
+                <stop offset="100%" stop-color="#0E5C73" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path class="mare-area"  id="mareArea"  d=""/>
+            <path class="mare-linha" id="mareLinha" d=""/>
+            <circle class="mare-agora" id="mareAgora" cx="0" cy="0" r="4"/>
+          </svg>
+          <div class="mare-pontos">
+            <div>Agora<b id="mareAlt">-- m</b></div>
+            <div style="text-align:right" id="marePx">Próxima<b>--</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="painel-rodape">
+      <span id="atualizadoEm">—</span>
+      <button class="btn-atualizar" id="btnAtualizar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/>
+        </svg>
+        Atualizar
+      </button>
+    </div>
+  </div>
+</section>
+
+<main class="palco">
+
+  <div class="caju-area" id="cajuArea" role="button" tabindex="0" aria-label="Caju, o guia">
+    <svg class="caju-svg" viewBox="0 0 200 200" id="cajuGraphic">
+      <path id="cajuBody" d="M100,20 C130,20 150,50 150,90 C150,130 130,160 100,160 C70,160 50,130 50,90 C50,50 70,20 100,20 Z"/>
+      <path id="cajuNut"  d="M75,150 C60,165 60,185 80,190 C100,195 120,180 120,160"/>
+      <path id="cajuStem" d="M100,20 C105,10 115,5 120,5" stroke="#2D3142" stroke-width="6"/>
+      <circle cx="75"  cy="80" r="18" class="caju-glasses"/>
+      <circle cx="125" cy="80" r="18" class="caju-glasses"/>
+      <path d="M93,80 L107,80"  stroke="#2D3142" stroke-width="4"/>
+      <path d="M57,80 L45,70"   stroke="#2D3142" stroke-width="4"/>
+      <path d="M143,80 L155,70" stroke="#2D3142" stroke-width="4"/>
+      <circle id="eyeL" cx="75"  cy="80" r="4" class="caju-eye"/>
+      <circle id="eyeR" cx="125" cy="80" r="4" class="caju-eye"/>
+      <path id="mouth" d="M90,110 Q100,120 110,110"/>
+      <path id="armL"  d="M50,90 Q30,100 40,120"/>
+      <path id="armR"  d="M150,90 Q170,100 160,120"/>
+    </svg>
+  </div>
+
+  <div class="cabecalho">
+    <h1>Netinho.io</h1>
+    <p>Seu especialista no Litoral do Piauí</p>
+  </div>
+
+  <div class="chat" id="chat">
+    <div id="mensagens" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="linha"><div class="digitando" id="digitando">
+      <span class="ponto"></span><span class="ponto"></span><span class="ponto"></span>
+    </div></div>
+  </div>
+
+  <div class="rodape">
+    <div class="sugestoes" id="sugestoes"></div>
+    <div class="entrada">
+      <input type="text" id="userInput" autocomplete="off" enterkeyhint="send"
+             placeholder="Pergunte sobre o litoral piauiense…" aria-label="Sua pergunta">
+      <button class="btn-enviar" id="btnEnviar" aria-label="Enviar pergunta">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 12L3.269 3.126A59.768 59.768 0 0 1 21.485 12 59.77 59.77 0 0 1 3.27 20.876L5.999 12zm0 0h7.5"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
